@@ -46,7 +46,7 @@ public class PortViewer : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             connected.color = dark;
         }
 
-        if (c.flag == PortFlag.Amplify)
+        if (c.portType == PortType.Amplify)
         {
             normal.pixelsPerUnitMultiplier = 1;
             hint.pixelsPerUnitMultiplier = 1;
@@ -54,7 +54,7 @@ public class PortViewer : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         }
 
         // label
-        if (c.type == IOType.Input)
+        if (c.ioType == IOType.Input)
         {
             _label = right;
             left.gameObject.SetActive(false);
@@ -75,7 +75,7 @@ public class PortViewer : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         get
         {
             var offset = transform.position - bp.transform.position;
-            return bp.transform.localPosition + offset;
+            return transform.position;
         }
     }
 
@@ -146,7 +146,7 @@ public class PortViewer : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void OnNodeBeDrag()
     {
-        if (config.type == IOType.Input)
+        if (config.ioType == IOType.Input)
             Edge?.SetEnd(RefPosition);
         else
             Edge?.SetStart(RefPosition);

@@ -24,10 +24,10 @@ public class RootViewer : BPViewerBase
         description.text = config.description;
         cost.text = $"{config.cost} ms";
         
-        var index = config.ports[0];
+        var pConfig = config.ports[0];
         outputPort.index = 0;
         outputPort.bp = this;
-        outputPort.config = ConfigHandler.Instance.PortConfigs[index];
+        outputPort.config = pConfig;
         ports.Add(outputPort);
     }
 

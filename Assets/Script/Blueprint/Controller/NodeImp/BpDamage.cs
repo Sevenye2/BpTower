@@ -49,16 +49,16 @@ public class BpDamage : BlueprintBase
         base.RefreshCollection();
 
         _onKilled = Ports
-            .Where(p => p.Config.type == IOType.Output)
-            .Where(p => p.Config.flag == PortFlag.Process)
-            .Where(p => p.Config.port == PortType.OnKilled)
+            .Where(p => p.Config.ioType == IOType.Output)
+            .Where(p => p.Config.portType == PortType.Process)
+            .Where(p => p.Config.flag == "OnKilled")
             .Where(p => p.Node != null)
             .Select(p => p.Node).ToList();
 
         _damagePorts = Ports
-            .Where(p => p.Config.type == IOType.Input)
-            .Where(p => p.Config.flag == PortFlag.Amplify)
-            .Where(p => p.Config.port == PortType.Damage)
+            .Where(p => p.Config.ioType == IOType.Input)
+            .Where(p => p.Config.portType == PortType.Amplify)
+            .Where(p => p.Config.flag == "Damage")
             .Where(p => p.Node != null)
             .Select(p => p.Node).ToList();
     }

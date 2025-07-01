@@ -20,15 +20,14 @@ public class EdgeHandler
         {
             _startPort = port;
             _edge = GlobalUI.Instance.programmingUI.blueprintUI.CreateEdge();
-            _edge.SetStart(_startPort.RefPosition);
-            _edge.SetEnd(_startPort.RefPosition);
-            _isControlStart = IOType.Input == port.config.type;
+            _edge.UpdateLine(_startPort.RefPosition, _startPort.RefPosition);
+            _isControlStart = IOType.Input == port.config.ioType;
 
         }
         else
         {
             _edge = port.Edge;
-            _isControlStart = IOType.Input != port.config.type;
+            _isControlStart = IOType.Input != port.config.ioType;
 
             if (_isControlStart)
             {
@@ -60,7 +59,7 @@ public class EdgeHandler
     {
         if (_isControlStart)
         {
-            if (port.config.type == IOType.Input)
+            if (port.config.ioType == IOType.Input)
             {
                 Discard();
                 return;
@@ -68,14 +67,14 @@ public class EdgeHandler
         }
         else
         {
-            if (port.config.type == IOType.Output)
+            if (port.config.ioType == IOType.Output)
             {
                 Discard();
                 return;
             }
         }
 
-        if (_startPort.config.flag != port.config.flag)
+        if (_startPort.config.portType != port.config.portType)
         {
             Discard();
             return;

@@ -44,7 +44,7 @@ public partial class VectorLine {
 	int m_vertexCount;
 	
 	[SerializeField]
-	public GameObject m_go;
+	private GameObject m_go;
 	[SerializeField]
 	RectTransform m_rectTransform;
 	public RectTransform rectTransform {

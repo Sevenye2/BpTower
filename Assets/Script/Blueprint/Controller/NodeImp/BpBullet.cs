@@ -51,16 +51,16 @@ public class BpBullet : BlueprintBase
         base.RefreshCollection();
 
         OnHit = Ports
-            .Where(p => p.Config.type == IOType.Output)
-            .Where(p => p.Config.flag == PortFlag.Process)
-            .Where(p => p.Config.port == PortType.OnHit)
+            .Where(p => p.Config.ioType == IOType.Output)
+            .Where(p => p.Config.portType == PortType.Process)
+            .Where(p => p.Config.flag == "OnHit")
             .Where(p => p.Node != null)
             .Select(p => p.Node).ToList();
 
         _ampDistance = Ports
-            .Where(p => p.Config.type == IOType.Input)
-            .Where(p => p.Config.flag == PortFlag.Amplify)
-            .Where(p => p.Config.port == PortType.Distance)
+            .Where(p => p.Config.ioType == IOType.Input)
+            .Where(p => p.Config.portType == PortType.Amplify)
+            .Where(p => p.Config.flag == "Distance")
             .Where(p => p.Node != null)
             .Select(p => p.Node).ToList();
     }

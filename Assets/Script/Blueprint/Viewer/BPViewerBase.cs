@@ -53,7 +53,7 @@ public abstract class BPViewerBase : MonoBehaviour, IPointerDownHandler, IPointe
         data.position = new List<float>() { transform.position.x, transform.position.y };
     }
 
-    private void SetLine()
+    public void SetLine()
     {
         ports.Where(port => port.Edge != null).ToList().ForEach(port => port.OnNodeBeDrag());
     }

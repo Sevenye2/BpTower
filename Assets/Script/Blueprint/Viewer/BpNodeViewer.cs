@@ -25,13 +25,12 @@ public class BpNodeViewer : BPViewerBase
 
         for (int i = 0; i < config.ports.Length; i++)
         {
-            var id = config.ports[i];
-            var pConfig = ConfigHandler.Instance.PortConfigs[id];
+            var pConfig = config.ports[i];
             var io = Factory.CreatePortView(i, this, pConfig);
             Transform parent;
-            if (pConfig.type == IOType.Input)
+            if (pConfig.ioType == IOType.Input)
             {
-                parent = pConfig.flag == PortFlag.Process ? inputLayout : amplifyLayout;
+                parent = pConfig.portType == PortType.Process ? inputLayout : amplifyLayout;
             }
             else
             {

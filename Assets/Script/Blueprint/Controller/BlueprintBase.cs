@@ -22,7 +22,8 @@ public abstract class BlueprintBase
         Ports = new BlueprintPort[Config.ports.Length];
         for (var i = 0; i < Ports.Length; i++)
         {
-            Ports[i] = new BlueprintPort(Config.ports[i]);
+            var config = Config.ports[i];
+            Ports[i] = new BlueprintPort(i, config);
         }
     }
 
@@ -35,22 +36,24 @@ public abstract class BlueprintBase
     public virtual void RefreshCollection()
     {
         _process = Ports
-            .Where(p => p.Config.type == IOType.Output)
-            .Where(p => p.Config.flag == PortFlag.Process)
-            .Where(p => p.Config.port == PortType.Main)
+            .Where(p => p.Config.ioType == IOType.Output)
+            .Where(p => p.Config.portType == PortType.Process)
+            .Where(p => p.Config.flag == "Main")
             .Where(p => p.Node != null)
             .Select(p => p.Node)
             .ToList();
 
         Amplify = Ports
-            .Where(p => p.Config.type == IOType.Input)
-            .Where(p => p.Config.flag == PortFlag.Amplify)
+            .Where(p => p.Config.ioType == IOType.Input)
+            .Where(p => p.Config.portType == PortType.Amplify)
             .Where(p => p.Node != null)
             .Select(p => p.Node)
             .ToList();
     }
-    
-    public virtual void RefreshValues() { }
+
+    public virtual void RefreshValues()
+    {
+    }
 
     protected virtual float CalculateCosts()
     {
@@ -75,10 +78,12 @@ public class BlueprintPort
 {
     public readonly BpPortConfig Config;
     public BlueprintBase Node;
+    public int Index;
 
-    public BlueprintPort(int index)
+    public BlueprintPort(int index, BpPortConfig config)
     {
-        Config = ConfigHandler.Instance.PortConfigs[index];
+        Index = index;
+        Config = config;
     }
 }
 

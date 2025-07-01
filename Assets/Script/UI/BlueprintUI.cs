@@ -8,11 +8,11 @@ using UnityEngine.UI;
 
 public class BlueprintUI : MonoBehaviour
 {
-
     public Transform nodePanel;
     public Transform linePanel;
-    public readonly List<BPViewerBase> Nodes = new();
-    
+    private readonly List<BPViewerBase> _nodes = new();
+    private readonly List<EdgeViewer> _edges = new();
+
     public void Start()
     {
     }
@@ -25,7 +25,7 @@ public class BlueprintUI : MonoBehaviour
         foreach (var data in SaveDataHandler.Temp.nodes)
         {
             var n = Factory.CreateNodeViewer(nodePanel, data);
-            Nodes.Add(n);
+            _nodes.Add(n);
         }
 
         // 等待 unity 将位置设置完毕
@@ -34,8 +34,9 @@ public class BlueprintUI : MonoBehaviour
         // creat edge
         foreach (var data in SaveDataHandler.Temp.edges)
         {
-            var e = new EdgeViewer(linePanel);
+            var e = new EdgeViewer(linePanel, data);
             EdgeSet(e, data);
+            _edges.Add(e);
         }
 
         Refresh();
@@ -44,29 +45,31 @@ public class BlueprintUI : MonoBehaviour
     public void CreateNode(BpNodeSaveData data)
     {
         var n = Factory.CreateNodeViewer(nodePanel, data);
-        Nodes.Add(n);
+        _nodes.Add(n);
         SaveDataHandler.Temp.nodes.Add(data);
     }
 
     public void RemoveNode(BPViewerBase bp)
     {
         SaveDataHandler.Temp.nodes.Remove(bp.data);
-        Nodes.Remove(bp);
-        bp.ports.Where(io => io && io.Edge != null).Select(io=>io.Edge).ToList().ForEach(RemoveEdge);
+        _nodes.Remove(bp);
+        bp.ports.Where(io => io && io.Edge != null).Select(io => io.Edge).ToList().ForEach(RemoveEdge);
         Destroy(bp.gameObject);
     }
 
     public EdgeViewer CreateEdge()
     {
-        var e = new EdgeViewer(linePanel);
-        SaveDataHandler.Temp.edges.Add(e.Data);
+        var data = new BpEdgeSaveData();
+        var e = new EdgeViewer(linePanel, data);
+        _edges.Add(e);
+        SaveDataHandler.Temp.edges.Add(data);
         return e;
     }
 
     private void EdgeSet(EdgeViewer edge, BpEdgeSaveData data)
     {
-        var startNode = Nodes.Find(n => n.data.uid == data.outputUid);
-        var endNode = Nodes.Find(n => n.data.uid == data.inputUid);
+        var startNode = _nodes.Find(n => n.data.uid == data.outputUid);
+        var endNode = _nodes.Find(n => n.data.uid == data.inputUid);
 
         var output = startNode.GetPort(data.outputPort);
         var input = endNode.GetPort(data.inputPort);
@@ -77,26 +80,35 @@ public class BlueprintUI : MonoBehaviour
     public void RemoveEdge(EdgeViewer edge)
     {
         SaveDataHandler.Temp.edges.Remove(edge.Data);
+        _edges.Remove(edge);
         edge.Discard();
     }
 
     public void Refresh()
     {
-        Nodes.Where(n => n.config.style == 0)
+        _nodes.Where(n => n.config.style == 0)
             .ToList()
             .ForEach(n => n.Refresh());
+    }
+
+    public void OnViewPortChange()
+    {
+        foreach (var edge in _edges)
+        {
+            edge.UpdateLine();
+        }
     }
 
 
     public void Clear()
     {
-        Nodes.Clear();
-
+        _nodes.Clear();
         while (nodePanel.childCount > 0)
         {
             DestroyImmediate(nodePanel.GetChild(0).gameObject);
         }
 
+        _edges.Clear();
         while (linePanel.childCount > 0)
         {
             DestroyImmediate(linePanel.GetChild(0).gameObject);

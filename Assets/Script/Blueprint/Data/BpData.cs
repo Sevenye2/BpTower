@@ -9,21 +9,12 @@ public enum IOType
     Output
 }
 
-public enum PortFlag
+public enum PortType
 {
     Process,
     Amplify
 }
 
-public enum PortType
-{
-    Main,
-    OnKilled,
-    OnHit,
-    Damage,
-    Distance,
-    Radius
-}
 
 public enum NodeStyle
 {
@@ -45,16 +36,17 @@ public struct BpNodeConfig
     public string className;
     public string json;
     public NodeStyle style;
-    public int[] ports;
+    public BpPortConfig[] ports;
 }
 
 [Serializable]
 public struct BpPortConfig
 {
-    public IOType type;
-    public PortFlag flag;
-    public PortType port;
+    public IOType ioType;
+    public PortType portType;
+    public string flag;
     public string description;
+    public float weight;
 }
 
 
