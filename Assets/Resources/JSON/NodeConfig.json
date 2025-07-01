@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Loop",
+    "description": "Execute Per Some Time",
+    "cost": "100",
+    "rare": "0",
+    "prise": "5000",
+    "className": "BpUpdate",
+    "json": "null",
+    "style": "0",
+    "ports": [1]
+  },
+  {
+    "name": "Shoot Bullet",
+    "description": "Attack <3m enemy",
+    "cost": "500",
+    "rare": "0",
+    "prise": "1000",
+    "className": "BpBullet",
+    "json": "null",
+    "style": "1",
+    "ports": [0,2,7]
+  },
+  {
+    "name": "+1",
+    "description": "+1",
+    "cost": "0",
+    "rare": "1",
+    "prise": "2000",
+    "className": "BpAmplify",
+    "json": "{ExFix: 1, ExPercent:0}",
+    "style": "2",
+    "ports": [4]
+  },
+  {
+    "name": "Parallel 2",
+    "description": "",
+    "cost": "100",
+    "rare": "1",
+    "prise": "2000",
+    "className": "BpParallel",
+    "json": "null",
+    "style": "2",
+    "ports": [0,1,1]
+  },
+  {
+    "name": "Merge 2",
+    "description": "",
+    "cost": "0",
+    "rare": "1",
+    "prise": "2000",
+    "className": "BpMerge",
+    "json": "null",
+    "style": "2",
+    "ports": [4,5,5]
+  },
+  {
+    "name": "Damage",
+    "description": "Deal 5 Damage",
+    "cost": "500",
+    "rare": "0",
+    "prise": "1000",
+    "className": "BpDamage",
+    "json": "{Value:5}",
+    "style": "1",
+    "ports": [0,0,0,3,6]
+  }
+]
