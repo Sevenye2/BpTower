@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Framework;
@@ -7,7 +8,6 @@ public class PlayerController
 {
     public PlayerViewer Viewer;
     private readonly List<IBpRoot> _executors = new();
-
     private static int Hp
     {
         get => SaveDataHandler.Temp.hp;
@@ -26,8 +26,8 @@ public class PlayerController
     {
         Viewer = viewer;
         viewer.Controller = this;
-        var nodes = new List<BlueprintBase>();
 
+        var nodes = new List<BlueprintBase>();
         foreach (var n in data.nodes.Select(Factory.CreateBlueprint))
         {
             n.Controller = this;
@@ -71,4 +71,5 @@ public class PlayerController
             .ToList()
             .ForEach(update => update.OnUpdate());
     }
+
 }

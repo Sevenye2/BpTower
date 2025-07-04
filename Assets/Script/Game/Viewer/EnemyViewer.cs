@@ -4,13 +4,12 @@ using UnityEngine;
 
 public class EnemyViewer : Object2D
 {
-    public SpriteRenderer body;
     private Transform _shadow;
-    private EnemyController _controller;
+    public EnemyController Controller;
     public HpBar hpBar;
     public void Init(Transform shadow, EnemyController controller)
     {
-        _controller = controller;
+        Controller = controller;
         _shadow = shadow;
     }
 
@@ -29,9 +28,9 @@ public class EnemyViewer : Object2D
 
     private void Update()
     {
-        if (_controller != null)
+        if (Controller != null)
         {
-            hpBar.SetValue(_controller.Hp/ EnemyController.HpMax);
+            hpBar.SetValue(Controller.Hp/ EnemyController.HpMax);
         }
         
     }
@@ -39,6 +38,6 @@ public class EnemyViewer : Object2D
 
     public void BeAttacked(float damage, Action onKilled)
     {
-        _controller.OnBeAttacked(damage, onKilled);
+        Controller?.OnBeAttacked(damage, onKilled);
     }
 }

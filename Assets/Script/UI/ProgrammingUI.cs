@@ -28,7 +28,7 @@ public class ProgrammingUI : MonoBehaviour
         SaveDataHandler.Temp.point -= 100;
         storeUI.Clear();
 
-        _ = storeUI.CreateShopItem(1);
+        _ = storeUI.CreateShopItem(7);
         _ = storeUI.CreateShopItem(2);
         _ = storeUI.CreateShopItem(3);
         _ = storeUI.CreateShopItem(4);

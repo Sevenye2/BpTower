@@ -25,8 +25,8 @@ public class EnemyAtk : EnemyState
         Idle.Jump();
         Player.Controller.BeAttacked(5);
 
-        _ = Explosion.CreateAsync(_o);
-        Controller.OnDead();
+        _ = FXFactory.BigExplosion.CreateAsync(_o);
+        Controller.Destroy();
     }
 
     protected override void OnExit()

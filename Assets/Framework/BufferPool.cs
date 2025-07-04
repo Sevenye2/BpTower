@@ -36,13 +36,13 @@ namespace Framework
             var behaviour = _pools.Pop();
             return behaviour;
         }
-        
+
         public async UniTask<T> CreateAsync()
         {
             if (_pools.Count == 0)
             {
                 var require = Object.InstantiateAsync(_prefab);
-                await require; 
+                await require;
                 return require.Result[0];
             }
 
@@ -50,28 +50,34 @@ namespace Framework
             return behaviour;
         }
 
-        public async UniTask CreateAsync(int count, Action<T> onCreated = null, Action onCompleted = null)
+        public async UniTask CreateAsync(int count, Action<T, int> onCreated = null, Action onCompleted = null)
         {
             if (count == 0)
                 return;
 
-            var c = _pools.Count;
-
+            var c = count;
+            var index = 0;
             while (_pools.Count > 0)
             {
                 var behaviour = _pools.Pop();
-                onCreated?.Invoke(behaviour);
+                onCreated?.Invoke(behaviour, index);
+
+                index++;
+                c--;
+
                 if (c == 0)
                     return;
             }
 
-            var require = Object.InstantiateAsync(_prefab);
-            
+
+            var require = Object.InstantiateAsync(_prefab, c);
+
             await require;
 
             foreach (var behaviour in require.Result)
             {
-                onCreated?.Invoke(behaviour);
+                onCreated?.Invoke(behaviour, index);
+                index++;
             }
 
             onCompleted?.Invoke();
@@ -88,7 +94,7 @@ namespace Framework
             {
                 Object.Destroy(obj.gameObject);
             }
-            
+
             _pools.Clear();
         }
     }

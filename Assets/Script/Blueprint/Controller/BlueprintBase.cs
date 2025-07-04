@@ -15,6 +15,8 @@ public abstract class BlueprintBase
     // 
     private List<BlueprintBase> _process;
     protected List<BlueprintBase> Amplify;
+    protected BlueprintBase OnHit;
+    protected BlueprintBase OnKilled;
 
     protected BlueprintBase(BpNodeSaveData data)
     {
@@ -32,7 +34,6 @@ public abstract class BlueprintBase
         Ports[port].Node = other;
     }
 
-
     public virtual void RefreshCollection()
     {
         _process = Ports
@@ -49,6 +50,17 @@ public abstract class BlueprintBase
             .Where(p => p.Node != null)
             .Select(p => p.Node)
             .ToList();
+
+        OnHit = Ports
+            .Where(p =>
+            {
+                var output = p.Config.ioType == IOType.Output;
+                var type = p.Config.portType == PortType.Process;
+                var flag = p.Config.flag == "OnHit";
+                return output && type && flag && p.Node != null;
+            })
+            .Select(p => p.Node)
+            .FirstOrDefault(); 
     }
 
     public virtual void RefreshValues()

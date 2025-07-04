@@ -53,7 +53,6 @@ public class ProcessController : MonoSingleton<ProcessController>
     #region Battle
 
     public PlayerController Player;
-    private List<EnemyController> _enemies = new();
 
     private bool _isGameOver;
 
@@ -70,7 +69,6 @@ public class ProcessController : MonoSingleton<ProcessController>
             // SpawnEnemy
             var ctl = new EnemyController();
             await ctl.Link();
-            _enemies.Add(ctl);
             var gap = Random.Range(0, 500);
 
             await UniTask.Delay(gap);
@@ -99,8 +97,7 @@ public class ProcessController : MonoSingleton<ProcessController>
             Player.Run();
 
             // clean
-            _enemies = _enemies.Where(c => c._isDead == false).ToList();
-            _enemies.ForEach(e => { e.Run(); });
+            EnemyController.RunAll();
 
             yield return new WaitForEndOfFrame();
 
@@ -111,9 +108,7 @@ public class ProcessController : MonoSingleton<ProcessController>
         }
         
         // Clear
-        _enemies.ForEach(e => { e.OnDead(); });
-        _enemies.Clear();
-        EnemyController.Clear();
+        EnemyController.ClearAll();
     }
 
     public void GameOver(bool isWin)
@@ -130,7 +125,7 @@ public class ProcessController : MonoSingleton<ProcessController>
         }
         else
         {
-            GlobalUI.Instance.battleUI.console.Log("<size=20><color=red>Lose :(<.color></size>");
+            GlobalUI.Instance.battleUI.console.Log("<size=20><color=red>Lose :(</color></size>");
         }
     }
 

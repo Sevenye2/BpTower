@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Framework;
 using UnityEngine;
@@ -11,11 +12,24 @@ public class EnemyController
 {
     private static BufferPool<EnemyViewer> _pool;
     private static BufferPool<Transform> _shadowPool;
+    private static List<EnemyController> _enemies = new();
 
-    public static void Clear()
+    public static void ClearAll()
     {
+        _enemies.ForEach(e =>
+        {
+            Object.Destroy(e.Viewer.gameObject);
+            Object.Destroy(e._shadow.gameObject);
+        });
+        _enemies.Clear();
         _pool?.Clear();
         _shadowPool?.Clear();
+    }
+
+    public static void RunAll()
+    {
+        _enemies = _enemies.Where(c => !c._isDead).ToList();
+        _enemies.ForEach(e => { e.Run(); });
     }
 
 
@@ -24,7 +38,7 @@ public class EnemyController
     public EnemyViewer Viewer;
     private Transform _shadow;
     private readonly FsmAdvance _fsm;
-    public bool _isDead = false;
+    private bool _isDead;
 
     public EnemyController()
     {
@@ -55,7 +69,7 @@ public class EnemyController
     public async UniTask Link()
     {
         var angle = Random.Range(0f, 360f);
-        var distance = Random.Range(9.8f, 12.2f);
+        var distance = 0.5f * Random.Range(9.8f, 12.2f);
 
         var position = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * distance;
 
@@ -67,10 +81,12 @@ public class EnemyController
 
         Viewer.gameObject.SetActive(true);
         _shadow.gameObject.SetActive(true);
+
+        _enemies.Add(this);
     }
 
 
-    public void Run()
+    private void Run()
     {
         _fsm.Run();
     }
@@ -83,20 +99,21 @@ public class EnemyController
         OnDead();
     }
 
-    private void Dead()
-    {
-    }
-
-
-    public void OnDead()
+    public void Destroy()
     {
         _isDead = true;
-        Viewer.gameObject.SetActive(false);
-        _shadow.gameObject.SetActive(false);
+        Viewer.Controller = null;
 
+        Viewer.gameObject.SetActive(false);
         _pool.Destroy(Viewer);
+
+        _shadow.gameObject.SetActive(false);
         _shadowPool.Destroy(_shadow);
-        
+    }
+
+    private void OnDead()
+    {
+        Destroy();
         ProcessController.Instance.EnemyDead(this);
     }
 }

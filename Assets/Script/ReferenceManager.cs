@@ -14,7 +14,6 @@ public class ReferenceManager : MonoSingleton<ReferenceManager>
     public Transform enemyShadowPrefab;
     public Bullet bulletPrefab;
     public Transform bulletShadowPrefab;
-    public Explosion explosionPrefab;
     public HpBar hpBarPrefab;
     [Header("References")] 
     public PlayerViewer player;
