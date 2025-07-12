@@ -30,7 +30,7 @@ public class EnemyViewer : Object2D
     {
         if (Controller != null)
         {
-            hpBar.SetValue(Controller.Hp/ EnemyController.HpMax);
+            hpBar.SetValue(Controller.Hp/ Controller.HpMax);
         }
         
     }

@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class BpWheel : BlueprintBase
 {
-    private List<BlueprintBase> _onHit;
     
     // Start is called before the first frame update
     public BpWheel(BpNodeSaveData data) : base(data)
@@ -29,16 +28,11 @@ public class BpWheel : BlueprintBase
     }
     private void OnHitCallback(RuntimeData data)
     {
-        _onHit.ForEach(n => n.DoNext(data));
+        OnHit?.DoNext(data);
     }
+
     public override void RefreshCollection()
     {
         base.RefreshCollection();
-        _onHit = Ports
-            .Where(p => p.Config.ioType == IOType.Output)
-            .Where(p => p.Config.portType == PortType.Process)
-            .Where(p => p.Config.flag == "OnHit")
-            .Where(p => p.Node != null)
-            .Select(p => p.Node).ToList();
     }
 }

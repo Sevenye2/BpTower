@@ -37,8 +37,8 @@ public class BattleUI : MonoBehaviour
         level.SetText($"\"Level = {l}\"");
     }
 
-    public void LogHp(int value)
+    public void LogHp(int value, int max)
     {
-        hp.text = $"\"Hp = {value}\"";
+        hp.text = $"\"Hp = {value}/{max}\"";
     }
 }

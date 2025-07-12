@@ -8,22 +8,25 @@ public class PlayerController
 {
     public PlayerViewer Viewer;
     private readonly List<IBpRoot> _executors = new();
+    private int _hpMax;
     private static int Hp
     {
-        get => SaveDataHandler.Temp.hp;
-        set => SaveDataHandler.Temp.hp = value;
+        get => SaveDataHandler.Data.hp;
+        set => SaveDataHandler.Data.hp = value;
     }
 
     public void BeAttacked(int damage)
     {
         Hp -= damage;
         if (Hp <= 0)
-            ProcessController.Instance.GameOver(false);
+            ProcessController.Instance.Lose();
     }
     
 
     public void ReLoad(BpSaveData data, PlayerViewer viewer)
     {
+        SaveDataHandler.PropertyRefresh();
+        
         Viewer = viewer;
         viewer.Controller = this;
 
@@ -64,12 +67,20 @@ public class PlayerController
         }
     }
 
+    public void OnStart()
+    {
+        _hpMax = 20 + SaveDataHandler.Upgrades.ExtraHpMax;
+        Hp = Mathf.Clamp(Hp + SaveDataHandler.Upgrades.RestoreHpOnStart, 0, _hpMax);
+    }
 
     public void Run()
     {
+        GlobalUI.Instance.battleUI.LogHp(Hp, _hpMax);
+        
         _executors.OfType<IBlueprintUpdate>()
             .ToList()
             .ForEach(update => update.OnUpdate());
     }
 
 }
+

@@ -9,12 +9,12 @@ public abstract class BlueprintBase
     public PlayerController Controller;
 
     public BpNodeSaveData Data { get; }
-    protected BpNodeConfig Config => ConfigHandler.Instance.NodeConfigs[Data.id];
+    protected BpNodeConfig Config => ConfigHandler.NodeConfigs[Data.id];
     protected readonly BlueprintPort[] Ports;
 
     // 
     private List<BlueprintBase> _process;
-    protected List<BlueprintBase> Amplify;
+    private List<BlueprintBase> _amplify;
     protected BlueprintBase OnHit;
     protected BlueprintBase OnKilled;
 
@@ -44,7 +44,7 @@ public abstract class BlueprintBase
             .Select(p => p.Node)
             .ToList();
 
-        Amplify = Ports
+        _amplify = Ports
             .Where(p => p.Config.ioType == IOType.Input)
             .Where(p => p.Config.portType == PortType.Amplify)
             .Where(p => p.Node != null)
@@ -52,15 +52,22 @@ public abstract class BlueprintBase
             .ToList();
 
         OnHit = Ports
-            .Where(p =>
+            .FirstOrDefault(p =>
             {
                 var output = p.Config.ioType == IOType.Output;
                 var type = p.Config.portType == PortType.Process;
                 var flag = p.Config.flag == "OnHit";
-                return output && type && flag && p.Node != null;
-            })
-            .Select(p => p.Node)
-            .FirstOrDefault(); 
+                return output && type && flag && p.Node != null; 
+            })?.Node;
+        
+        OnKilled = Ports
+            .FirstOrDefault(p =>
+            {
+                var output = p.Config.ioType == IOType.Output;
+                var type = p.Config.portType == PortType.Process;
+                var flag = p.Config.flag == "OnKilled";
+                return output && type && flag && p.Node != null; 
+            })?.Node; 
     }
 
     public virtual void RefreshValues()
@@ -80,9 +87,9 @@ public abstract class BlueprintBase
         }
     }
 
-    public virtual Property GetProperty(Property data)
+    public virtual ValueProperty GetProperty(ValueProperty data)
     {
-        return Amplify.Aggregate(data, (current, node) => node.GetProperty(current));
+        return _amplify.Aggregate(data, (current, node) => node.GetProperty(current));
     }
 }
 
@@ -105,7 +112,7 @@ public class RuntimeData
     public EnemyViewer Enemy;
 }
 
-public class Property
+public class ValueProperty
 {
     public float Value;
     public float ExFix;
@@ -113,7 +120,7 @@ public class Property
 
     public float Result => Value + ExFix + Value * ExPercent;
 
-    public Property(float value)
+    public ValueProperty(float value)
     {
         Value = value;
     }

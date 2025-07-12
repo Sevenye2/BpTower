@@ -34,18 +34,19 @@ public class EnemyController
 
 
     public float Hp { get; private set; }
-    public const float HpMax = 10;
+    public float HpMax { get; private set; }
     public EnemyViewer Viewer;
     private Transform _shadow;
     private readonly FsmAdvance _fsm;
     private bool _isDead;
 
-    public EnemyController()
+    public EnemyController(int hp)
     {
         _pool ??= new(ReferenceManager.Instance.enemyPrefab);
         _shadowPool ??= new(ReferenceManager.Instance.enemyShadowPrefab);
 
-        Hp = HpMax;
+        Hp = hp;
+        HpMax = hp;
 
         _fsm = new FsmAdvance();
 

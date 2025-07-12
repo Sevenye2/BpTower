@@ -56,7 +56,7 @@ public class Doom : Object2D
         var results = new Collider2D[16];
         var size = Physics2D.OverlapCircleNonAlloc(WorldPosition, _data.Radius, results);
 
-        Debug.Log(size);
+        Debug.DrawRay(transform.position, Vector3.right * _data.Radius, Color.red,2);
         
         for (var i = 0; i < size; i++)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -19,65 +20,70 @@ public class ProgrammingUI : MonoBehaviour
 
     public void Update()
     {
-        point.text = $"Point: {SaveDataHandler.Temp.point}";
-    }
-
-
-    public void OnRefresh()
-    {
-        SaveDataHandler.Temp.point -= 100;
-        storeUI.Clear();
-
-        _ = storeUI.CreateShopItem(7);
-        _ = storeUI.CreateShopItem(2);
-        _ = storeUI.CreateShopItem(3);
-        _ = storeUI.CreateShopItem(4);
-        _ = storeUI.CreateShopItem(5);
+        point.text = $"Point: {SaveDataHandler.Data.point}";
     }
 
     public void BuyNode(ShopItem item)
     {
-        item.data.uid = SaveDataHandler.Temp.GetUid();
+        item.data.uid = SaveDataHandler.Data.GetUid();
         blueprintUI.CreateNode(item.data);
-        SaveDataHandler.Temp.point -= item.config.cost;
+        SaveDataHandler.Data.point -= item.config.cost;
         item.DestroyItem();
     }
 
-    public async UniTask OpenAsync()
+    public async UniTask OpenAsync(Action onMasked = null)
     {
         await GlobalUI.Instance.mask.FadeAsync(1, 500);
-
+        onMasked?.Invoke();
         gameObject.SetActive(true);
-        storeUI.Refresh();
+        RefreshShop();
         await blueprintUI.LoadAsync();
 
         await UniTask.DelayFrame(10);
         _ = GlobalUI.Instance.mask.FadeAsync(1);
     }
 
-    private async UniTask CloseAsync()
+    private async UniTask CloseAsync(Action onMasked = null)
     {
         await GlobalUI.Instance.mask.FadeAsync(1, 500);
+        onMasked?.Invoke();
         gameObject.SetActive(false);
         Clear();
 
         _ = GlobalUI.Instance.mask.FadeAsync(1);
     }
+    
+    public void RefreshShop()
+    {
+        storeUI.Clear();
+
+        var configs = ConfigHandler.NodeConfigs;
+        var list = configs.Where(c => c.rare <= SaveDataHandler.Upgrades.ExtraRare).ToList();
+
+        for (var i = 0; i < 3 + SaveDataHandler.Upgrades.ExtraShopCount; i++)
+        {
+            var index = SaveDataHandler.Data.Random(0, list.Count);
+            _ = storeUI.CreateShopItem(list[index].id);
+        }
+    }
+    
 
     private void Clear()
     {
         blueprintUI.Clear();
+        storeUI.Clear();
     }
 
     public void Restore()
     {
         Clear();
         _ = blueprintUI.LoadAsync();
+        RefreshShop();
     }
 
-    public void SaveAndClose()
+    public void Confirm()
     {
-        SaveDataHandler.Save();
         _ = CloseAsync();
+        ProcessController.Instance.BattleStart();
     }
 }

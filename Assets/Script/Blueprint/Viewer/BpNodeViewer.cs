@@ -17,7 +17,7 @@ public class BpNodeViewer : BPViewerBase
     public override void Initialize(BpNodeSaveData saveData)
     {
         data = saveData;
-        config = ConfigHandler.Instance.NodeConfigs[data.id];
+        config = ConfigHandler.NodeConfigs[data.id];
 
         title.text = config.name;
         description.text = config.description;

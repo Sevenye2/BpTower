@@ -1,15 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
-public class BlueprintViewPortUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class ViewPortScroll : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private bool _mouseIn = false;
-
+    
     private float _scale = 1;
-
-    public BlueprintUI blueprintUI;
+    public float min = 0.4f;
+    public float max = 1.5f;
+    public UnityEvent<float> onScroll;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,7 +27,7 @@ public class BlueprintViewPortUI : MonoBehaviour, IPointerEnterHandler, IPointer
         var delta = Input.mouseScrollDelta.y;
         _scale = Mathf.Clamp(_scale + delta / 50f, 0.4f, 1.5f);
         transform.localScale = Vector3.one * _scale;
-        blueprintUI.OnViewPortChange();
+        onScroll?.Invoke(_scale);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

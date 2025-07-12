@@ -15,7 +15,7 @@ public class GlobalUI : MonoSingleton<GlobalUI>
     public BattleUI battleUI;
     public SettlementUI settlementUI;
     public ContentMenuUI menuUI;
-
+    public NoticeUI noticeUI; 
     void Start()
     {
     }

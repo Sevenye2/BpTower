@@ -13,7 +13,7 @@ public class ExtendViewer : BPViewerBase
     public override void Initialize(BpNodeSaveData saveData)
     {
         data = saveData;
-        config = ConfigHandler.Instance.NodeConfigs[data.id];
+        config = ConfigHandler.NodeConfigs[data.id];
 
         description.text = config.description;
 

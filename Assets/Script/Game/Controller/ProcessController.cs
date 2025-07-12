@@ -20,15 +20,14 @@ public class ProcessController : MonoSingleton<ProcessController>
     {
         switch (text.ToLower())
         {
-            case "new":
-                NewGame();
-                GlobalUI.Instance.battleUI.console.Log("New Game : Level = 1, Time = 5 minus");
+            case "test":
+                BattleStart();
                 break;
             case "win":
-                GameOver(true);
+                Win();
                 break;
             case "lose":
-                GameOver(false);
+                Lose();
                 break;
             default:
                 GlobalUI.Instance.battleUI.console.Log("No Command Found, Type 'Help' To Get Help");
@@ -37,14 +36,9 @@ public class ProcessController : MonoSingleton<ProcessController>
     }
 
 
-    public void NewGame()
+    public void BattleStart()
     {
-        _isGameOver = false;
-
-        SpawnPlayer();
-
-        UniTask.Void(KeepSpawnEnemy);
-        StartCoroutine(BattleStart());
+        StartCoroutine(m_BattleStart());
     }
 
 
@@ -53,45 +47,55 @@ public class ProcessController : MonoSingleton<ProcessController>
     #region Battle
 
     public PlayerController Player;
-
     private bool _isGameOver;
+    private BattleData _battleData;
 
     private void SpawnPlayer()
     {
         Player = new PlayerController();
-        Player.ReLoad(SaveDataHandler.Temp, ReferenceManager.Instance.player);
+        Player.ReLoad(SaveDataHandler.Data, ReferenceManager.Instance.player);
     }
 
-    private async UniTaskVoid KeepSpawnEnemy()
+    private async UniTaskVoid KeepSpawnEnemy(int level)
     {
-        while (true)
-        {
-            // SpawnEnemy
-            var ctl = new EnemyController();
-            await ctl.Link();
-            var gap = Random.Range(0, 500);
-
-            await UniTask.Delay(gap);
-
-            if (_isGameOver)
-                break;
-        }
-    }
-
-    private IEnumerator BattleStart()
-    {
-        GlobalUI.Instance.battleUI.LogLevel(1);
-        var turnTime = 300f;
+        var enemyHp = LevelConfig.GetEnemyHp(level);
+        var enemySpawn = LevelConfig.GetSpawnTime(level);
 
         while (!_isGameOver)
         {
-            GlobalUI.Instance.battleUI.LogHp(SaveDataHandler.Temp.hp);
+            var hp = Random.Range(enemyHp.x, enemyHp.y);
+            // SpawnEnemy
+            var ctl = new EnemyController((int)hp);
+            await ctl.Link();
+            var gap = Random.Range(enemySpawn.x, enemySpawn.y);
+            await UniTask.WaitForSeconds(gap);
+        }
+    }
 
+    private IEnumerator m_BattleStart()
+    {
+        _isGameOver = false;
+        _battleData = new BattleData();
+
+        var level = SaveDataHandler.Data.level;
+        var minus = LevelConfig.GetGameTime(level);
+
+
+        GlobalUI.Instance.battleUI.console.Log($"New Game : Level = {level}, Time = {minus} minus");
+        GlobalUI.Instance.battleUI.LogLevel(level);
+        SpawnPlayer();
+        Player.OnStart();
+
+        _ = KeepSpawnEnemy(level);
+
+        var second = minus * 60;
+        while (!_isGameOver)
+        {
             // property
-            turnTime -= Time.deltaTime;
+            second -= Time.deltaTime;
 
             // display
-            GlobalUI.Instance.battleUI.LogTime(turnTime);
+            GlobalUI.Instance.battleUI.LogTime(second);
 
             // logic run
             Player.Run();
@@ -101,38 +105,72 @@ public class ProcessController : MonoSingleton<ProcessController>
 
             yield return new WaitForEndOfFrame();
 
-            if (!(turnTime <= 0)) 
+            if (!(second <= 0))
                 continue;
-            
-            GameOver(true);
+
+            Win();
         }
-        
+
         // Clear
-        EnemyController.ClearAll();
+        //EnemyController.ClearAll();
     }
 
-    public void GameOver(bool isWin)
+
+    public void Win()
     {
         _isGameOver = true;
+        
+        // display
+        GlobalUI.Instance.battleUI.console.Log("<size=20>Win :)</size>");
 
-        GlobalUI.Instance.settlementUI.Open(isWin);
+        var settlement = GlobalUI.Instance.settlementUI;
+        settlement.OnConfirm
+            = () => { _ = GlobalUI.Instance.programmingUI.OpenAsync(); };
 
-        if (isWin)
-        {
-            GlobalUI.Instance.battleUI.console.Log("<size=20>Win :)</size>");
-            GlobalUI.Instance.settlementUI.OnConfirm
-                = () => { _ = GlobalUI.Instance.programmingUI.OpenAsync(); };
-        }
-        else
-        {
-            GlobalUI.Instance.battleUI.console.Log("<size=20><color=red>Lose :(</color></size>");
-        }
+        settlement.AddDisplay("Level Clean", SaveDataHandler.Data.level);
+        settlement.AddDisplay("Level Award", 100);
+        settlement.AddDisplay("Get Point", _battleData.Pt);
+        
+        _ = settlement.Open(true);
+        
+        
+        // logic
+        SaveDataHandler.Data.point += 100 + _battleData.Pt;
+        SaveDataHandler.Data.level++;
+        SaveDataHandler.Save(); 
     }
+
+    public void Lose()
+    {
+        _isGameOver = true;
+        // display
+        GlobalUI.Instance.battleUI.console.Log("<size=20><color=red>Lose :(</color></size>");
+        GlobalUI.Instance.settlementUI.OnConfirm = () =>
+        {
+            _ = GlobalUI.Instance.startUI.OpenAsync();
+        };
+
+        _ = GlobalUI.Instance.settlementUI.Open(false);
+        //logic
+        EnemyController.ClearAll();
+        SaveDataHandler.Delete();
+    }
+
 
     public void EnemyDead(EnemyController controller)
     {
-        GlobalUI.Instance.battleUI.console.Log("<size=10>enemy killed</size>");
+        var pt = 1;
+        _battleData.Pt += pt;
+        _battleData.KillEnemy++;
+        GlobalUI.Instance.battleUI.console.Log($"<size=10>enemy killed, get pt:{pt}</size>");
     }
 
     #endregion
+}
+
+
+public class BattleData
+{
+    public int Pt;
+    public int KillEnemy;
 }

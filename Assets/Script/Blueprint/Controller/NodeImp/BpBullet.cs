@@ -6,14 +6,13 @@ using Random = UnityEngine.Random;
 
 public class BpBullet : BlueprintBase
 {
-    public List<BlueprintBase> OnHit;
     private List<BlueprintBase> _ampDistance;
 
-    private Property _distance;
+    private readonly ValueProperty _distance;
 
     public BpBullet(BpNodeSaveData data) : base(data)
     {
-        _distance = new Property(3);
+        _distance = new ValueProperty(3);
     }
 
     public override void DoNext(RuntimeData data)
@@ -42,7 +41,7 @@ public class BpBullet : BlueprintBase
 
     private void OnHitCallback(RuntimeData data)
     {
-        OnHit.ForEach(n => n.DoNext(data));
+        OnHit?.DoNext(data);
     }
 
 
@@ -50,12 +49,7 @@ public class BpBullet : BlueprintBase
     {
         base.RefreshCollection();
 
-        OnHit = Ports
-            .Where(p => p.Config.ioType == IOType.Output)
-            .Where(p => p.Config.portType == PortType.Process)
-            .Where(p => p.Config.flag == "OnHit")
-            .Where(p => p.Node != null)
-            .Select(p => p.Node).ToList();
+
 
         _ampDistance = Ports
             .Where(p => p.Config.ioType == IOType.Input)

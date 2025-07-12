@@ -73,7 +73,7 @@ public abstract class BPViewerBase : MonoBehaviour, IPointerDownHandler, IPointe
         var sellPt = (int)(config.prise * 0.5f);
         menu.AddBtn($"Sell:   {sellPt} point", () =>
         {
-            SaveDataHandler.Temp.point += sellPt;
+            SaveDataHandler.Data.point += sellPt;
             GlobalUI.Instance.programmingUI.blueprintUI.RemoveNode(this);
         });
         menu.AddBtn("Clean Link", () =>

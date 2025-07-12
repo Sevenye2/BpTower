@@ -22,7 +22,7 @@ public class BlueprintUI : MonoBehaviour
         SaveDataHandler.Load();
 
         // creat node
-        foreach (var data in SaveDataHandler.Temp.nodes)
+        foreach (var data in SaveDataHandler.Data.nodes)
         {
             var n = Factory.CreateNodeViewer(nodePanel, data);
             _nodes.Add(n);
@@ -32,7 +32,7 @@ public class BlueprintUI : MonoBehaviour
         await UniTask.Yield();
 
         // creat edge
-        foreach (var data in SaveDataHandler.Temp.edges)
+        foreach (var data in SaveDataHandler.Data.edges)
         {
             var e = new EdgeViewer(linePanel, data);
             EdgeSet(e, data);
@@ -46,12 +46,12 @@ public class BlueprintUI : MonoBehaviour
     {
         var n = Factory.CreateNodeViewer(nodePanel, data);
         _nodes.Add(n);
-        SaveDataHandler.Temp.nodes.Add(data);
+        SaveDataHandler.Data.nodes.Add(data);
     }
 
     public void RemoveNode(BPViewerBase bp)
     {
-        SaveDataHandler.Temp.nodes.Remove(bp.data);
+        SaveDataHandler.Data.nodes.Remove(bp.data);
         _nodes.Remove(bp);
         bp.ports.Where(io => io && io.Edge != null).Select(io => io.Edge).ToList().ForEach(RemoveEdge);
         Destroy(bp.gameObject);
@@ -62,7 +62,7 @@ public class BlueprintUI : MonoBehaviour
         var data = new BpEdgeSaveData();
         var e = new EdgeViewer(linePanel, data);
         _edges.Add(e);
-        SaveDataHandler.Temp.edges.Add(data);
+        SaveDataHandler.Data.edges.Add(data);
         return e;
     }
 
@@ -79,7 +79,7 @@ public class BlueprintUI : MonoBehaviour
 
     public void RemoveEdge(EdgeViewer edge)
     {
-        SaveDataHandler.Temp.edges.Remove(edge.Data);
+        SaveDataHandler.Data.edges.Remove(edge.Data);
         _edges.Remove(edge);
         edge.Discard();
     }
@@ -91,7 +91,7 @@ public class BlueprintUI : MonoBehaviour
             .ForEach(n => n.Refresh());
     }
 
-    public void OnViewPortChange()
+    public void OnBpViewPortChange()
     {
         foreach (var edge in _edges)
         {

@@ -25,6 +25,17 @@ public enum NodeStyle
 
 
 [Serializable]
+public struct UpgradeConfig
+{
+    public int id;
+    public string name;
+    public int cost;
+    public int max;
+    public string[] notice;
+    public Action<UpgradeProperty,int> OnLoad;
+}
+
+[Serializable]
 public struct BpNodeConfig
 {
     public int id;
@@ -75,9 +86,20 @@ public class BpSaveData
     public int hp;
     public int point;
     public int uidMax;
+    public int[] upgrades;
     public List<BpNodeSaveData> nodes = new List<BpNodeSaveData>();
     public List<BpEdgeSaveData> edges = new List<BpEdgeSaveData>();
 
+    public int level;
+    public int seed;
+    public int count;
+
+    public int Random(int min, int max)
+    {
+        count++;
+        return UnityEngine.Random.Range(min, max);
+    }
+    
     public int GetUid()
     {
         uidMax += 1;

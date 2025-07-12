@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +20,7 @@ public class StoreUI : MonoBehaviour
 
     public void Update()
     {
-        refreshButton.interactable = SaveDataHandler.Temp.point >= 100;
+        refreshButton.interactable = SaveDataHandler.Data.point >= 100;
         _shopItems.ForEach(n=> n.Display());
     }
 
@@ -30,13 +31,13 @@ public class StoreUI : MonoBehaviour
         var item = require.Result[0];
         _shopItems.Add(item);
 
-        var config = ConfigHandler.Instance.NodeConfigs[id];
+        var config = ConfigHandler.NodeConfigs[id];
         item.storeUI = this;
         item.config = config;
         item.data = new BpNodeSaveData()
         {
             id = id,
-            position = new List<float>() { Screen.width / 2, Screen.height / 2 }
+            position = new List<float>() { Screen.width / 2f, Screen.height / 2f }
         };
 
         item.Display();
@@ -51,6 +52,7 @@ public class StoreUI : MonoBehaviour
         _shopItems.Remove(shopItem);
     }
 
+
     public void Clear()
     {
         foreach (var item in _shopItems)
@@ -63,7 +65,8 @@ public class StoreUI : MonoBehaviour
 
     public void Refresh()
     {
-        programmingUI.OnRefresh();
+        SaveDataHandler.Data.point -= 100;
+        programmingUI.RefreshShop();
     }
 
 

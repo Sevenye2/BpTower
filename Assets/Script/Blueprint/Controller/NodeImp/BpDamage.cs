@@ -6,14 +6,13 @@ using UnityEngine;
 
 public class BpDamage : BlueprintBase
 {
-    private Property _damage;
-    private List<BlueprintBase> _onKilled;
+    private readonly ValueProperty _damage;
     private List<BlueprintBase> _damagePorts;
 
     // Start is called before the first frame update
     public BpDamage(BpNodeSaveData data) : base(data)
     {
-        _damage = JsonConvert.DeserializeObject<Property>(Config.json);
+        _damage = JsonConvert.DeserializeObject<ValueProperty>(Config.json);
     }
 
     public override void DoNext(RuntimeData data)
@@ -29,32 +28,22 @@ public class BpDamage : BlueprintBase
                     Position = data.Enemy.WorldPosition,
                     Enemy = data.Enemy
                 };
-                OnKilled(d);
+                OnKilledCallback(d);
             });
         }
 
         base.DoNext(data);
     }
 
-    private void OnKilled(RuntimeData data)
+    private void OnKilledCallback(RuntimeData data)
     {
-        foreach (var node in _onKilled)
-        {
-            node.DoNext(data);
-        }
+        OnKilled?.DoNext(data);
     }
 
     public override void RefreshCollection()
     {
         base.RefreshCollection();
-
-        _onKilled = Ports
-            .Where(p => p.Config.ioType == IOType.Output)
-            .Where(p => p.Config.portType == PortType.Process)
-            .Where(p => p.Config.flag == "OnKilled")
-            .Where(p => p.Node != null)
-            .Select(p => p.Node).ToList();
-
+        
         _damagePorts = Ports
             .Where(p => p.Config.ioType == IOType.Input)
             .Where(p => p.Config.portType == PortType.Amplify)

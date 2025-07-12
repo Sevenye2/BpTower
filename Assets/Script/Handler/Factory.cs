@@ -6,7 +6,7 @@ public static class Factory
 {
     public static BlueprintBase CreateBlueprint(BpNodeSaveData data)
     {
-        var config = ConfigHandler.Instance.NodeConfigs[data.id];
+        var config = ConfigHandler.NodeConfigs[data.id];
 
         var type = Type.GetType(config.className);
         if (type == null)
@@ -21,7 +21,7 @@ public static class Factory
     {
         const string basePath = "Prefabs/BlueprintViewer/";
 
-        var config = ConfigHandler.Instance.NodeConfigs[data.id];
+        var config = ConfigHandler.NodeConfigs[data.id];
 
         var path = config.style switch
         {

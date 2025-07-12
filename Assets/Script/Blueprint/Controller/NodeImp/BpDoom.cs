@@ -32,7 +32,7 @@ public class BpDoom : BlueprintBase
         _ = Doom.Create(new DoomData()
         {
             Target = position,
-            Radius = 1
+            Radius = 0.5f
         }, OnHitCallback);
 
         base.DoNext(data);
