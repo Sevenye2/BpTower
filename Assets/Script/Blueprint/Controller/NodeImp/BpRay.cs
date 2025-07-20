@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class BpRay : BlueprintBase
@@ -10,6 +11,9 @@ public class BpRay : BlueprintBase
     public BpRay(BpNodeSaveData data) : base(data)
     {
     }
+
+    private BlueprintBase _widthNode;
+    private readonly ValueProperty _width = new ValueProperty(30f);
 
     public override void DoNext(RuntimeData data)
     {
@@ -31,8 +35,8 @@ public class BpRay : BlueprintBase
         RayLine.Create(new RayLineData()
         {
             Duration = 2,
-            Length = 200,
-            Width = 3,
+            Length = 400,
+            Width = _width.Result / 10f,
             Origin = data.Position,
             Angle = angle,
             OnHitCallback = OnHitCallBack
@@ -45,5 +49,17 @@ public class BpRay : BlueprintBase
     private void OnHitCallBack(RuntimeData data)
     {
         OnHit?.DoNext(data);
+    }
+
+    public override void RefreshCollection()
+    {
+        base.RefreshCollection();
+        _widthNode = Ports.ToList().Find(p=>p.Config.flag == "Width").Node;
+    }
+
+    public override void RefreshValues()
+    {
+        base.RefreshValues();
+        _widthNode?.GetProperty(_width);
     }
 }

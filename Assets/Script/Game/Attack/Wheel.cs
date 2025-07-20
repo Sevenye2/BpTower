@@ -83,7 +83,6 @@ public struct WheelData
     public Vector3 Origin;
     public int Amount;
     public float Duration;
-    public float Damage;
     public float Radius;
     public float Distance;
     public float Speed;

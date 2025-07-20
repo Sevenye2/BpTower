@@ -94,7 +94,8 @@ public class EnemyController
 
     public void OnBeAttacked(float damage, Action onKilled)
     {
-        Hp -= damage;
+        Hp -= damage * (1 + SaveDataHandler.Upgrades.ExtraDamagePercent / 100f) 
+              + SaveDataHandler.Upgrades.ExtraDamageFix;
         if (Hp > 0) return;
         onKilled?.Invoke();
         OnDead();

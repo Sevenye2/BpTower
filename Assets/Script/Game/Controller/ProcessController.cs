@@ -110,34 +110,33 @@ public class ProcessController : MonoSingleton<ProcessController>
 
             Win();
         }
-
-        // Clear
-        //EnemyController.ClearAll();
+        
+        EnemyController.ClearAll();
     }
 
 
     public void Win()
     {
         _isGameOver = true;
-        
+        var levelAward = 100 + SaveDataHandler.Upgrades.ExtraAward;
         // display
         GlobalUI.Instance.battleUI.console.Log("<size=20>Win :)</size>");
 
         var settlement = GlobalUI.Instance.settlementUI;
         settlement.OnConfirm
             = () => { _ = GlobalUI.Instance.programmingUI.OpenAsync(); };
-
+        
         settlement.AddDisplay("Level Clean", SaveDataHandler.Data.level);
-        settlement.AddDisplay("Level Award", 100);
-        settlement.AddDisplay("Get Point", _battleData.Pt);
-        
+        settlement.AddDisplay("Enemy Killed", _battleData.KillEnemyCount);
+        settlement.AddDisplay("Level Award", levelAward);
+        settlement.AddDisplay("Get Point", _battleData.AwardPoint);
+
         _ = settlement.Open(true);
-        
-        
+
         // logic
-        SaveDataHandler.Data.point += 100 + _battleData.Pt;
+        SaveDataHandler.Data.point += levelAward + _battleData.AwardPoint;
         SaveDataHandler.Data.level++;
-        SaveDataHandler.Save(); 
+        SaveDataHandler.Save();
     }
 
     public void Lose()
@@ -145,23 +144,20 @@ public class ProcessController : MonoSingleton<ProcessController>
         _isGameOver = true;
         // display
         GlobalUI.Instance.battleUI.console.Log("<size=20><color=red>Lose :(</color></size>");
-        GlobalUI.Instance.settlementUI.OnConfirm = () =>
-        {
-            _ = GlobalUI.Instance.startUI.OpenAsync();
-        };
+        GlobalUI.Instance.settlementUI.OnConfirm = () => { _ = GlobalUI.Instance.startUI.OpenAsync(); };
 
         _ = GlobalUI.Instance.settlementUI.Open(false);
+        
         //logic
-        EnemyController.ClearAll();
         SaveDataHandler.Delete();
     }
 
 
     public void EnemyDead(EnemyController controller)
     {
-        var pt = 1;
-        _battleData.Pt += pt;
-        _battleData.KillEnemy++;
+        var pt = 1 + SaveDataHandler.Upgrades.ExtraEnemyAward;
+        _battleData.AwardPoint += pt;
+        _battleData.KillEnemyCount++;
         GlobalUI.Instance.battleUI.console.Log($"<size=10>enemy killed, get pt:{pt}</size>");
     }
 
@@ -171,6 +167,6 @@ public class ProcessController : MonoSingleton<ProcessController>
 
 public class BattleData
 {
-    public int Pt;
-    public int KillEnemy;
+    public int AwardPoint;
+    public int KillEnemyCount;
 }

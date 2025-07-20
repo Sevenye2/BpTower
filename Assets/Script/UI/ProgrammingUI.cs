@@ -58,7 +58,7 @@ public class ProgrammingUI : MonoBehaviour
         storeUI.Clear();
 
         var configs = ConfigHandler.NodeConfigs;
-        var list = configs.Where(c => c.rare <= SaveDataHandler.Upgrades.ExtraRare).ToList();
+        var list = configs.Where(c => c.rare <= 1 + SaveDataHandler.Upgrades.ExtraRare).ToList();
 
         for (var i = 0; i < 3 + SaveDataHandler.Upgrades.ExtraShopCount; i++)
         {
@@ -76,6 +76,8 @@ public class ProgrammingUI : MonoBehaviour
 
     public void Restore()
     {
+        SaveDataHandler.Load();
+
         Clear();
         _ = blueprintUI.LoadAsync();
         RefreshShop();

@@ -16,11 +16,12 @@ public class FXGenerator
     }
 
 
-    public async UniTask CreateAsync(Vector3 position)
+    public async UniTask CreateAsync(Vector3 position, float size = 1.0f)
     {
         var explosion = await _pool.CreateAsync();
 
         explosion.transform.position = position;
+        explosion.transform.localScale = Vector3.one * size;
         explosion.gameObject.SetActive(true);
 
         await UniTask.Delay(TimeSpan.FromSeconds(Duration));

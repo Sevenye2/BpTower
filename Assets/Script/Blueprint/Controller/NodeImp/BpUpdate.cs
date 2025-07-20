@@ -11,6 +11,8 @@ public class BpUpdate : BlueprintBase, IBlueprintUpdate
 
     public BpUpdate(BpNodeSaveData data) : base(data)
     {
+        _sumCosts = Config.cost - SaveDataHandler.Upgrades.ReduceUpdate;
+        _sumCosts /= 1000f;
     }
 
     public void OnUpdate()
@@ -29,6 +31,5 @@ public class BpUpdate : BlueprintBase, IBlueprintUpdate
 
     public void Recalculate()
     {
-        _sumCosts = CalculateCosts() / 1000f;
     }
 }

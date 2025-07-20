@@ -19,7 +19,6 @@ public class BlueprintUI : MonoBehaviour
 
     public async UniTask LoadAsync()
     {
-        SaveDataHandler.Load();
 
         // creat node
         foreach (var data in SaveDataHandler.Data.nodes)

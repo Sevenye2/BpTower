@@ -20,6 +20,7 @@ public class Doom : Object2D
 
         var doom = await _pool.CreateAsync();
         doom.Initialized(data, onHit);
+        doom.transform.localScale = Vector3.one * (0.6f * data.Size);
         doom.gameObject.SetActive(true);
     }
 
@@ -51,12 +52,12 @@ public class Doom : Object2D
         _pool.Destroy(this);
         gameObject.SetActive(false);
 
-        _ = FXFactory.Explosion.CreateAsync(_data.Target);
+        _ = FXFactory.Explosion.CreateAsync(_data.Target, _data.Size * 2);
 
         var results = new Collider2D[16];
-        var size = Physics2D.OverlapCircleNonAlloc(WorldPosition, _data.Radius, results);
+        var size = Physics2D.OverlapCircleNonAlloc(WorldPosition, _data.Size, results);
 
-        Debug.DrawRay(transform.position, Vector3.right * _data.Radius, Color.red,2);
+        Debug.DrawRay(transform.position, Vector3.right * _data.Size, Color.red,2);
         
         for (var i = 0; i < size; i++)
         {
@@ -77,5 +78,5 @@ public class Doom : Object2D
 public struct DoomData
 {
     public Vector3 Target;
-    public float Radius;
+    public float Size;
 }

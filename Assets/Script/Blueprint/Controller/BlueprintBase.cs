@@ -74,11 +74,6 @@ public abstract class BlueprintBase
     {
     }
 
-    protected virtual float CalculateCosts()
-    {
-        return Config.cost + _process.Sum(n => n.CalculateCosts());
-    }
-
     public virtual void DoNext(RuntimeData data)
     {
         foreach (var next in _process)

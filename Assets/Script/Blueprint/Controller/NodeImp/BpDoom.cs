@@ -12,6 +12,9 @@ public class BpDoom : BlueprintBase
     {
     }
 
+    private BlueprintBase _sizeNode;
+    
+    private readonly ValueProperty _size = new ValueProperty(50f);
 
     public override void DoNext(RuntimeData data)
     {
@@ -32,7 +35,7 @@ public class BpDoom : BlueprintBase
         _ = Doom.Create(new DoomData()
         {
             Target = position,
-            Radius = 0.5f
+            Size = _size.Result / 100f
         }, OnHitCallback);
 
         base.DoNext(data);
@@ -43,4 +46,15 @@ public class BpDoom : BlueprintBase
         OnHit?.DoNext(data);
     }
 
+    public override void RefreshCollection()
+    {
+        base.RefreshCollection();
+        _sizeNode = Ports.ToList().Find(p=>p.Config.flag == "Size").Node;
+    }
+
+    public override void RefreshValues()
+    {
+        base.RefreshValues();
+        _sizeNode?.GetProperty(_size);
+    }
 }

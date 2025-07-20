@@ -137,10 +137,13 @@ public static class SaveDataHandler
 
 public class UpgradeProperty
 {
-    public int UpdateNodeCost;
-    public int RestoreHpOnStart;
-    public int MoreDamagePercent;
+    public int ReduceUpdate;
+    public int ExtraDamageFix;
+    public int ExtraDamagePercent;
+    public int ExtraAward;
+    public int ExtraEnemyAward;
     public int ExtraHpMax;
+    public int RestoreHpOnStart;
     public int ExtraShopCount;
     public int ExtraRare;
 }

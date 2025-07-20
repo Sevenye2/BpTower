@@ -40,6 +40,7 @@ public class StartUI : MonoBehaviour
 
     public void LoadBtn()
     {
+        SaveDataHandler.Load();
         _ = GlobalUI.Instance.programmingUI.OpenAsync(Close);
     }
     

@@ -26,38 +26,45 @@ public class UpgradeItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private int Level => SaveDataHandler.Data.upgrades[id];
     private UpgradeConfig Config => ConfigHandler.UpgradeConfig[id];
-
+    private int Prise => Config.cost[Level];
 
     // Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
         pre.ForEach(item => item._back.Add(this));
         // display
 
         levelLabel.text = $"lv.{Level}/{Config.max}";
         nameLabel.text = Config.name;
-        costLabel.text = $"{Config.cost} pt";
-
-        m_Refresh();
     }
 
-    private void m_Refresh()
+    private void Update()
     {
-        levelLabel.text = $"lv.{Level}/{Config.max}";
-        
-        var self = pre.Aggregate(true, (current, item) => current && item.Level > 0 );
-        var activePre = _back.Aggregate(false,(current, item)=>current || item.Level > 0);
-        bg.color = self ? normalColor : unusedColor;
-        upBtn.gameObject.SetActive(Level < Config.max && self && SaveDataHandler.Data.point >= Config.cost);
-        downBtn.gameObject.SetActive(Level > 0 && self && !activePre);
+        Refresh();
     }
 
     private void Refresh()
     {
-        m_Refresh();
-        pre.ForEach(item => item.m_Refresh());
-        _back.ForEach(item => item.m_Refresh());
+        levelLabel.text = $"lv.{Level}/{Config.max}";
+        costLabel.text = Level < Config.max ? $"{Prise} pt" : $"MAX";
+
+        var self = pre.Aggregate(true, (current, item) => current && item.Level > 0);
+        var canMin = _back.Aggregate(false, (current, item) => current || item.Level > 0);
+
+        bg.color = self ? normalColor : unusedColor;
+
+        if (Level < Config.max)
+        {
+            upBtn.gameObject.SetActive(Level < Config.max && self && SaveDataHandler.Data.point >= Prise);
+        }
+        else
+        {
+            upBtn.gameObject.SetActive(false);
+        }
+
+        downBtn.gameObject.SetActive(Level > 0 && self && !canMin);
     }
+
 
     private void DisplayNotice()
     {
@@ -79,9 +86,8 @@ public class UpgradeItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void LevelUp()
     {
+        SaveDataHandler.Data.point -= Config.cost[Level];
         SaveDataHandler.Data.upgrades[id]++;
-        SaveDataHandler.Data.point -= Config.cost;
-        Refresh();
         DisplayNotice();
         SaveDataHandler.PropertyRefresh();
     }
@@ -89,8 +95,7 @@ public class UpgradeItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void LevelDown()
     {
         SaveDataHandler.Data.upgrades[id]--;
-        SaveDataHandler.Data.point += Config.cost;
-        Refresh();
+        SaveDataHandler.Data.point += Config.cost[Level];
         DisplayNotice();
         SaveDataHandler.PropertyRefresh();
     }

@@ -29,8 +29,8 @@ public struct UpgradeConfig
 {
     public int id;
     public string name;
-    public int cost;
     public int max;
+    public int[] cost;
     public string[] notice;
     public Action<UpgradeProperty,int> OnLoad;
 }
